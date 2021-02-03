@@ -1,0 +1,144 @@
+# Sample Arbitrader configuration file
+#
+# Copy this file to "application.yaml" and fill out the settings that you want for your bot.
+# When you run the JAR file, make sure the config file is in the current directory so it can be read.
+#
+# The configurations here are meant to demonstrate and document the different features of Arbitrader.
+# For more up to date configurations that have been contributed and tested by our community check out
+# this page:
+# https://github.com/scionaltera/arbitrader/wiki/Recommended-Exchange-Configurations
+
+# If you want to see a LOT of logs, you can turn on DEBUG by uncommenting this:
+# logging:
+#   level:
+#     com:
+#       r307:
+#         arbitrader: DEBUG
+
+# If you wish to be notified by email on every trade then you need to add your mail server configuration here and
+# configure the email notifications in notifications.mail section.
+# spring:
+#   mail:
+#     host: smtp.dragan.it     # Your mail server host
+#     username: android@dragan.it # Your mail server username (may or may not be your email address)
+#     password: Nessuna0015! # Your mail server password
+#     port: 25     # Your mail server port
+#     properties:
+#       # If your email supports SSL or TLS, set this property to true
+#       mail.smtp.ssl.enable: true
+
+notifications:
+  # Send all the logs you see on the console to Discord using webhook. Be aware that Discord applies a rate limit so
+  # if you are logging too much some logs may not show up on Discord
+  discord:
+    webhookId: 805031013356797963
+    webhookToken: HRBDnM64-wj8noPRt3Jw57pBXp_0dRAfUG7v9l84OQ4VQGNWaza2oiA-iYTT7o-WUX9Z
+  # slack: # If you fill out this section, all the logs you see on the console will also be shipped to Slack.
+  #   accessToken: x
+  #   botAccessToken: x
+  #   channel: x
+  logs:
+    # The number of milliseconds before a slow ticker update generates a warning in the logs.
+    # Ticker updates are supposed to run every 3 seconds, but the time it takes to fetch them from the exchange's API
+    # can vary based on your internet connection speed, other things your computer is working on and how busy the
+    # exchange's API is. Because there are so many factors it made sense to be able to configure the warning so you can
+    # control how noisy your logs are.
+    slowTickerWarning: 4000
+  # mail:
+  #   # Set to true to enable email notifications for each trade
+  #   active: false
+  #   # The email address to send mail FROM
+  #   from: marco@dragan.it
+  #   # The email address to send mail TO
+  #   to: dragan77@me.com
+
+trading:
+  # The percentage difference between the "long" and "short" exchanges before we will open our positions.
+  entrySpread: 0.0080
+
+  # The percentage difference *in profit only* before we will close our positions.
+  # Fees will be added to this amount.
+  exitTarget: 0.0050
+
+  # (Default: false)
+  # Log notifications when a spreadIn reaches an all time high, or a spreadOut reaches an all time low.
+  # This gets very noisy at first because the values all start out empty, but after a few minutes it quiets down.
+  # These notifications can be very useful for tuning your entrySpread and exitTarget because it shows you what the
+  # ranges for the spreads are.
+  spreadNotifications: true
+
+  # (Optional)
+  # Specify the size per trade. If this value is missing, the bot will default to 90% of the balance
+  # of the exchange that has the smallest balance. I highly recommend starting out the bot
+  # with a fixedExposure around 10.00 to avoid risking much money at first.
+  fixedExposure: 10.00
+
+  # (Optional)
+  # If for some reason you want to block a specific combination of exchanges from trading, this is how you do it.
+  # Each entry in the list is of the format "LongExchangeName:ShortExchangeName:CurrencyPair".
+  #
+  # In my case the bot tends to go long on Quoine and short on Kraken but those two exchanges almost never reverse
+  # so the trades can be open for several days or weeks. In the meantime I'm losing fees and maybe missing other
+  # opportunities.
+  tradeBlacklist:
+    - Quoine:Kraken:ETH/USD
+
+  # (Optional)
+  # Set a time limit for open positions. If a position is open longer than the time limit it will be closed regardless
+  # of whether it will turn a profit or not. The value of this property is expressed in hours. 24 equals 1 day.
+  tradeTimeout: 48
+
+  # (Optional)
+  # Enable paper trading. Orders will not be forwarded to the exchanges. Instead, a paper exchange will execute the
+  # order at the limit price. The paper exchange start with a cash balance of 100.
+  # Enable the autoFill option to fill the trigger the order completion after 1s: useful to avoid waiting for the good
+  # market condition. If false, the paper exchange will wait for the limit price to be met by the real exchange.
+  paper:
+    active: true
+    autoFill: true
+
+  # Connection information for each exchange goes in this list.
+  #
+  # To add a new exchange or remove one that you don't use, either add or remove the configuration from this list.
+  # Arbitrader uses the XChange library to talk to exchanges, so you can try any of the 60+ exchanges implemented in
+  # that project. Not all of them support all the features the bot needs, so you should be careful when you try out
+  # a new exchange for the first time. If you can, consider submitting pull requests to XChange to add better support
+  # for more exchanges!
+  exchanges:
+    -
+      exchangeClass: org.knowm.xchange.binance.BinanceExchange
+      apiKey: bCo6YJdHJ8FHSx7CDgSF8rhKfWcpcjJizA4ftgKA4NC4TOun3rvVwyWC9sdCWmcd
+      secretKey: Bn6eCk1NaQrD90HQsPXUMIUSnUFwDNZC0GWKcUjvt5X5CuUjPcnaZE1kq1rads25
+      tradingPairs:
+        - BTC/EUR
+        - ETH/EUR
+      margin: true
+      fee: 0.001
+      homeCurrency: EUR
+
+    -
+      exchangeClass: org.knowm.xchange.bitfinex.BitfinexExchange
+      apiKey: Os5zFyEVGz3hvCXbtmwsaZbEaj9T8GEOGM9O0tJQTFU
+      secretKey: 0XR1zQFEI93fcXllYcUS8Qo2SwKJ57FDHUN1o3TFIBR
+      tradingPairs:
+        - BTC/EUR
+        - ETH/EUR
+      margin: true
+      fee: 0.002
+      homeCurrency: EUR
+
+    -
+      exchangeClass: info.bitrich.xchangestream.coinbasepro.CoinbaseProStreamingExchange
+      apiKey: H5n9sz94TPcT0pHu
+      secretKey: N7YZqOJsC1pSyiWDkI7cjfGxLeATKpKf
+      custom:
+        passphrase: x
+      ticker:
+        batchSize: 3
+        batchDelay: 1250
+      tradingPairs:
+        - BTC/EUR
+        - ETH/EUR
+      margin: false
+      fee: 0.0015
+      homeCurrency: EUR
